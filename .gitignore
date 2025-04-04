@@ -1,0 +1,26 @@
+# macOS
+.DS_Store
+
+# Python
+venv/
+__pycache__/
+
+# IDEs
+.vscode/
+.idea/
+
+# Private
+private*.*
+private*/
+*key*.*
+cache/
+
+# Tests
+test*.*
+test*/
+
+# Build files
+build/
+dist/
+setup.py
+*.spec
