@@ -18,6 +18,11 @@ jobs:
     - name: "Build"
       if: matrix.os == 'windows-latest'
       run: ./scripts/build.bat
+    - uses: actions/upload-artifact@v4
+      if: matrix.os == 'windows-latest'
+      with:
+        name: 3DS-RPC.exe
+        path: dist/3DS-RPC.exe
 
     # macOS Build
     - name: "Build"
@@ -26,13 +31,8 @@ jobs:
         ./scripts/build.sh &&
         cd ./dist &&
         zip -yr "3DS-RPC Mac.zip" 3DS-RPC.app/
-
-    # For normal commits, upload the created artifact.
     - uses: actions/upload-artifact@v4
-      with:
-        name: 3DS-RPC.exe
-        path: dist/3DS-RPC.exe
-    - uses: actions/upload-artifact@v4
+      if: matrix.os == 'macos-latest'
       with:
         name: '3DS-RPC Mac.zip'
         path: 'dist/3DS-RPC Mac.zip'
