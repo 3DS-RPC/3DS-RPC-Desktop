@@ -7,6 +7,14 @@ OPTIONS = {
         'readline',
     ],
     'iconfile': 'layout/resources/logo.icns',
+    # Prevents an issue involving setuptools' vendored
+    # packages causing conflicts with our own versions.
+    #
+    # For further information:
+    # https://github.com/ronaldoussoren/py2app/issues/531
+    'excludes': [
+        'setuptools',
+    ]
 }
 
 import os
@@ -30,4 +38,5 @@ setup(
     data_files=DATA_FILES,
     options={'py2app': OPTIONS},
     setup_requires=['py2app'],
-    name='3DS-RPC')
+    name='3DS-RPC',
+)
