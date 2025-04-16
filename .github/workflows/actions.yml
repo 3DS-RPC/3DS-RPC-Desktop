@@ -6,7 +6,6 @@ jobs:
     name: 'Build 3DS-RPC'
     runs-on: ${{ matrix.os }}
     strategy:
-      fail-fast: false
       matrix:
         os: ['windows-latest', 'macos-latest']
     steps:
@@ -31,11 +30,16 @@ jobs:
     # For normal commits, upload the created artifact.
     - uses: actions/upload-artifact@v4
       with:
-        path: dist/3DS-RPC*
+        name: 3DS-RPC.exe
+        path: dist/3DS-RPC.exe
+    - uses: actions/upload-artifact@v4
+      with:
+        name: '3DS-RPC Mac.zip'
+        path: 'dist/3DS-RPC Mac.zip'
 
     # If this is a release, additionally attach
     # the created applications to the release.
-    - name: "Upload Build"
+    - name: "Upload Release Build"
       if: github.ref_type == 'tag'
       uses: softprops/action-gh-release@v2
       with:

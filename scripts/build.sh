@@ -12,6 +12,5 @@ fi
 # Install requirements.
 python3 -m pip install -r requirements.txt
 
-# Build the macOS bundle, and show the user.
+# Build the macOS bundle.
 python3 setupMac.py py2app -O2
-open dist
