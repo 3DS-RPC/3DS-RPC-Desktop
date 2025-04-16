@@ -1,7 +1,5 @@
 name: 'Build 3DS-RPC'
-on:
-  release:
-    types: [published]
+on: [push, pull_request, release]
 
 jobs:
   build:
@@ -12,33 +10,33 @@ jobs:
       matrix:
         os: ['windows-latest', 'macos-latest']
     steps:
-    - uses: actions/checkout@v3
-    - uses: actions/setup-python@v3
+    - uses: actions/checkout@v4
+    - uses: actions/setup-python@v5
       with:
-        python-version: 3.10.11
+        python-version: 3.10
 
     # Windows Build
     - name: "Build"
       if: matrix.os == 'windows-latest'
       run: cd scripts && ./build.bat
 
-    - name: "Upload Build"
-      if: matrix.os == 'windows-latest'
-      uses: softprops/action-gh-release@v0.1.15
-      with:
-        files: dist/3DS-RPC.exe
-
-    # MacOS Build
+    # macOS Build
     - name: "Build"
       if: matrix.os == 'macos-latest'
       run: |
-        cd scripts &&
-        ./build.sh &&
-        cd ../dist &&
-        zip -yr mac.zip 3DS-RPC.app/
+        ./scripts/build.sh &&
+        cd ./dist &&
+        zip -yr "3DS-RPC Mac.zip" 3DS-RPC.app/
 
-    - name: "Upload Build"
-      if: matrix.os == 'macos-latest'
-      uses: softprops/action-gh-release@v0.1.15
+    # For normal commits, upload the created artifact.
+    - uses: actions/upload-artifact@v4
       with:
-        files: dist/mac.zip
+        path: dist/3DS-RPC*
+
+    # If this is a release, additionally attach
+    # the created applications to the release.
+    - name: "Upload Build"
+      if: github.ref_type == 'tag'
+      uses: softprops/action-gh-release@v2
+      with:
+        files: dist/3DS-RPC*
