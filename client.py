@@ -4,26 +4,41 @@ import requests, os, sys, time
 import xmltodict, json
 import pickle
 import asyncio, threading
+from urllib.parse import urlsplit
 try:
     from api import *
 except:
     sys.path.append('../')
     from api import *
 import pypresence
+from PyQt5.QtCore import QLockFile
 
 requests.packages.urllib3.disable_warnings(requests.packages.urllib3.exceptions.InsecureRequestWarning)
 
-local = False
-version = 0.31
+version = 0.32
 
-host = 'https://3dsrpc.com' # Change the host as you'd wish
-if local:
-    host = 'http://127.0.0.1:2277'
+# Endpoint presets. The selection lives client-side in the config.
+officialHost = 'https://3dsrpc.com'
+host = officialHost
 
-## The below contains 3dsrpc.com-specific information
-## You will have to provide your own 'bot' FC if you are planning
-## on running your own front and backend.
-friend_code_to_principal_id(nintendoBotFC) # A quick verification check
+def getHost(endpoint:str, customEndpoint:str = '') -> str:
+    endpoint = (endpoint or 'official').lower()
+    if endpoint == 'custom' and customEndpoint:
+        return customEndpoint.strip().rstrip('/')
+    return officialHost
+
+def validateEndpoint(url:str) -> str:
+    url = (url or '').strip()
+    if not url:
+        raise ValueError('Please enter a custom endpoint URL.')
+    parts = urlsplit(url)
+    if parts.scheme not in ('http', 'https') or not parts.netloc:
+        raise ValueError('Custom endpoint must be a full URL, e.g. https://your-server.example.com')
+    if parts.path not in ('', '/'):
+        raise ValueError('Custom endpoint cannot include a subpath. Use just the host, e.g. https://your-server.example.com')
+    if parts.query or parts.fragment:
+        raise ValueError('Custom endpoint cannot include a query string or fragment.')
+    return url.rstrip('/')
 
 _REGION = typing.Literal['ALL', 'US', 'JP', 'GB', 'KR', 'TW']
 path = getAppPath()
@@ -32,36 +47,67 @@ logFile = os.path.join(path, 'logs.txt')
 
 # Config template
 configTemplate = {
-    'friendCode': '',
+    'apiKey': '',
+    'endpoint': 'official',
+    'customEndpoint': '',
     'showElapsed': True,
     'showProfileButton': False,
     'showSmallImage': False,
-    'fetchTime': 30,
+    'fetchTime': 60,
 }
+
+lockPath = os.path.join(path, '3dsrpc.lock')
+
+def acquireLock(timeout:int = 100):
+    lock = QLockFile(lockPath)
+    return lock if lock.tryLock(timeout) else None
 
 def log(text:str):
     with open(logFile, 'a') as file:
         file.write('%s: %s\n' % (time.time(), text.replace('\n',' ')))
     print(Color.RED + text)
 
+class RateLimitedError(Exception):
+    def __init__(self, retry_after = None):
+        try:
+            self.wait = float(retry_after)
+        except (TypeError, ValueError):
+            self.wait = 30
+        super().__init__('Rate limited. Waiting %ss.' % self.wait)
+
+class BackendOfflineError(Exception):
+    def __init__(self):
+        super().__init__('Backend currently offline. Retrying later.')
+
+class InvalidAPIKeyError(Exception):
+    def __init__(self):
+        super().__init__('Invalid console API key.')
+
 class Client():
-    def __init__(self, friendCode: str, config:dict, *, GUI = None):
-        ### Maintain typing ###
-        friendCode = str(principal_id_to_friend_code(friend_code_to_principal_id(friendCode))).zfill(12) # Friend Code check
-        with open(privateFile, 'w') as file: # Save FC and config to file
+    def __init__(self, apiKey: str, config:dict, *, GUI = None):
+        with open(privateFile, 'w') as file: # Save API key and config to file
             js = configTemplate
-            js['friendCode'] = friendCode
+            js['apiKey'] = apiKey
             for key in config.keys():
                 if key in configTemplate.keys():
                     js[key] = config[key]
             file.write(json.dumps(js))
 
-        # FC variables
-        self.friendCode = friendCode
+        # Server-auth variables
+        self.apiKey = js.get('apiKey', '')
+
+        # Endpoint variables
+        self.endpoint = js.get('endpoint', 'official')
+        self.customEndpoint = js.get('customEndpoint', '')
+        self.host = getHost(self.endpoint, self.customEndpoint)
+        self.local = '127.0.0.1' in self.host or 'localhost' in self.host
 
         # Client-config
         self.connected = False
         self.userData = {}
+
+        # Re-authentication coordination
+        self.authWait = threading.Event()
 
         # Discord-related variables
         self.currentGame = {'@id': None}
@@ -84,13 +130,23 @@ class Client():
                 js[key] = self.__dict__[key]
             file.write(json.dumps(js))
 
+    # Change the endpoint (official / custom)
+    def setEndpoint(self, endpoint:str, customEndpoint:str = ''):
+        self.endpoint = endpoint
+        self.customEndpoint = customEndpoint
+        self.host = getHost(endpoint, customEndpoint)
+        self.local = '127.0.0.1' in self.host or 'localhost' in self.host
+        self.reflectConfig()
+
+    # Set a new API key after an invalid/expired one
+    def updateKey(self, apiKey:str):
+        self.apiKey = apiKey
+        self.authWait.set()
+        self.reflectConfig()
+
     # Get from API
     def APIget(self, route:str, content:dict = {}):
-        return requests.get(host + '/api/' + route, data = content, headers = {'User-Agent':'3DS-RPC/%s' % version,})
-
-    # Post to API
-    def APIpost(self, route:str, content:dict = {}):
-        return requests.post(host + '/api/' + route, data = content, headers = {'User-Agent':'3DS-RPC/%s' % version,})
+        return requests.get(self.host + '/api/' + route, params = content, headers = {'User-Agent':'3DS-RPC/%s' % version, 'X-API-KEY': self.apiKey,})
 
     # Connect to PyPresence
     def connect(self, pipe:str = '0'):
@@ -99,7 +155,7 @@ class Client():
             self.rpc.connect()
         except Exception as e:
             if self.GUI:
-                self.GUI.error(str(e), traceback.format_exc())
+                self.GUI.bridge.errored.emit(str(e), traceback.format_exc())
             else:
                 raise e
         self.connected = True
@@ -113,39 +169,35 @@ class Client():
         self.rpc = None
         self.connected = False
 
-    def login(self):
-        r = self.APIpost('user/create/%s' % self.friendCode)
-        try:
-            r = r.json()
-        except:
-            APIExcept(r)
-        if r['Exception']:
-            if not 'UNIQUE constraint failed: friends.friendCode' in r['Exception']['Error']:
-                raise APIException(r['Exception'])
-        return r
-
     def fetch(self):
-        r = self.APIget('user/%s' % self.friendCode)
+        r = self.APIget('user/activeConsoles')
+        if r.status_code == 429:
+            raise RateLimitedError(r.headers.get('Retry-After'))
+        if r.status_code == 502:
+            raise BackendOfflineError()
         try:
             r = r.json()
         except:
             APIExcept(r)
         if r['Exception']:
-            if 'not recognized' in r['Exception']['Error']:
-                print('%sRemember, the bot\'s friend code is as follows:\n%s%s' % (Color.YELLOW, '-'.join(nintendoBotFC[i:i+4] for i in range(0, len(nintendoBotFC), 4)), Color.DEFAULT))
+            error = r['Exception']['Error']
+            if 'offline' in error:
+                raise BackendOfflineError()
+            if 'invalid console API key' in error:
+                raise InvalidAPIKeyError()
             raise APIException(r['Exception'])
         return r
 
     def loop(self):
         userData = self.fetch();self.userData = userData
-        presence = userData['User']['Presence']
+        console = userData['consoles'][0] if userData.get('consoles') else None
 
-        _pass = None
-        if userData['User']['online'] and presence:
+        logger = 'Update'
+        if console and console.get('online') and console.get('Presence'):
 
+            presence = console['Presence']
             game = presence['game']
 
-            logger = 'Update'
             if self.currentGame != game:
                 logger += ' [%s -> %s]' % (self.currentGame['@id'], game['@id'])
                 self.currentGame = game
@@ -158,18 +210,18 @@ class Client():
                 # Include View Profile setting?
                 # Certainly something when presence['joinable'] == True
             }
-            if game['icon_url']:
-                kwargs['large_image'] = game['icon_url'].replace('/cdn/', host + '/cdn/')
+            if game.get('icon_url'):
+                kwargs['large_image'] = game['icon_url'].replace('/cdn/', self.host + '/cdn/')
                 kwargs['large_text'] = game['name']
-            if presence['gameDescription']:
+            if presence.get('gameDescription'):
                 kwargs['state'] = presence['gameDescription']
-            if self.showProfileButton and userData['User']['username']:
-                kwargs['buttons'] = [{'label': 'Profile', 'url': host + '/user/' + userData['User']['friendCode']},]
+            if self.showProfileButton and console.get('username'):
+                kwargs['buttons'] = [{'label': 'Profile', 'url': self.host + '/user/' + console['friendCode']},]
             if self.showElapsed:
                 kwargs['start'] = self.start
-            if self.showSmallImage and userData['User']['username'] and game['icon_url']:
-                kwargs['small_image'] = userData['User']['mii']['face']
-                kwargs['small_text'] = '-'.join(userData['User']['friendCode'][i:i+4] for i in range(0, 12, 4))
+            if self.showSmallImage and console.get('username') and game.get('icon_url'):
+                kwargs['small_image'] = console['mii']['face']
+                kwargs['small_text'] = '-'.join(console['friendCode'][i:i+4] for i in range(0, 12, 4))
             for key in list(kwargs): # Blatant rip from OpenEmuRPC (also made by me. Check it out if you want)
                 if isinstance(kwargs[key], str) and not 'image' in key:
                     if len(kwargs[key]) < 2:
@@ -177,56 +229,94 @@ class Client():
                     elif len(kwargs[key]) > 128:
                         kwargs[key] = kwargs[key][:128]
             if self.connected:self.rpc.update(**kwargs)
-            if self.GUI:self.GUI.update(kwargs)
+            if self.GUI:self.GUI.bridge.updated.emit(kwargs)
         else:
             logger = 'Clear [%s -> %s]' % (self.currentGame['@id'], None)
             self.currentGame = {'@id': None}
             if self.connected:self.rpc.clear()
-            if self.GUI:self.GUI.update(None)
+            if self.GUI:self.GUI.bridge.updated.emit(None)
         self.gameLog.append(logger)
 
     def background(self):
         try:
-            self.login() # Create account if not yet existent
             while True:
-                self.loop()
-                time.sleep(self.fetchTime) # Wait 30 seconds between calls
+                try:
+                    self.loop()
+                except InvalidAPIKeyError:
+                    log('Invalid API key.')
+                    if self.GUI:
+                        self.GUI.bridge.reauthRequested.emit()
+                    else:
+                        log('Use the \'apikey\' command to set a new key.')
+                    self.authWait.wait()
+                    self.authWait.clear()
+                except (RateLimitedError, BackendOfflineError) as e:
+                    log(str(e))
+                    if self.GUI:
+                        self.GUI.bridge.statusChanged.emit('Rate limited. Retrying shortly...' if isinstance(e, RateLimitedError) else 'Backend offline. Retrying...')
+                    time.sleep(getattr(e, 'wait', self.fetchTime))
+                time.sleep(self.fetchTime) # Wait 60 seconds between calls
         except Exception as e:
             if self.GUI:
-                self.GUI.error(str(e), traceback.format_exc())
+                self.GUI.bridge.errored.emit(str(e), traceback.format_exc())
             else:
                 log('Failed\n' + str(e))
                 print(traceback.format_exc())
                 os._exit(0)
 
 def main():
-    friendCode = None
+    lock = acquireLock()
+    if not lock:
+        print('%sAnother instance of 3DS-RPC is already running.%s' % (Color.RED, Color.DEFAULT))
+        os._exit(0)
 
-    # Create directory for logging and friend code saving
+    apiKey = None
+    config = {}
+
+    # Create directory for logging and API key saving
     if not os.path.isdir(path):
         os.mkdir(path)
     try:
         if os.path.isfile(privateFile):
             with open(privateFile, 'r') as file:
                 js = json.loads(file.read())
-                friendCode = js['friendCode']
+                apiKey = js.get('apiKey', '')
                 config = js
-                del config['friendCode']
-        else:
-            raise Exception()
+                config.pop('apiKey', None)
     except:
-        print('%sPlease take this time to add the bot\'s FC to your target 3DS\' friends list.\n%sBot FC: %s%s' % (Color.YELLOW, Color.DEFAULT, Color.BLUE, '-'.join(nintendoBotFC[i:i+4] for i in range(0, 12, 4))))
-        input('%s[Press enter to continue]%s' % (Color.GREEN, Color.DEFAULT))
-        friendCode = input('Please enter your 3DS\' friend code\n> %s' % Color.PURPLE)
+        apiKey = None
         config = {}
+
+    # The endpoint must be known before we can connect, so ask first if it's missing
+    if not config.get('endpoint'):
+        print('%sWhich endpoint would you like to use? (official or custom)%s' % (Color.YELLOW, Color.DEFAULT))
+        endpoint = input('Please enter your endpoint (official or custom)\n> %s' % Color.PURPLE)
+        if endpoint.lower() not in ('official', 'custom'):
+            endpoint = 'official'
+        config['endpoint'] = endpoint
+        if endpoint.lower() == 'custom':
+            while True:
+                customUrl = input('Please enter your custom endpoint URL\n> %s' % Color.PURPLE)
+                try:
+                    config['customEndpoint'] = validateEndpoint(customUrl)
+                    break
+                except ValueError as e:
+                    print('%s%s%s' % (Color.RED, e, Color.DEFAULT))
+        print(Color.DEFAULT, end = '')
+
+    if not apiKey:
+        print('%sPlease grab your API key from the Settings page on your endpoint%s' % (Color.YELLOW, Color.DEFAULT))
+        apiKey = input('Please enter your API key\n> %s' % Color.PURPLE)
         print(Color.DEFAULT, end = '')
 
     try:
-        client = Client(friendCode, config)
-    except (AssertionError, FriendCodeValidityError) as e:
+        client = Client(apiKey, config)
+    except (AssertionError) as e:
         if os.path.isfile(privateFile):
             os.remove(privateFile)
         raise e
+
+    print('%sConnecting to %s%s' % (Color.BLUE, client.host, Color.DEFAULT))
 
     # Begin main thread for user configuration
     con = Console(client)

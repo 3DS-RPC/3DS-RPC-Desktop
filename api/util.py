@@ -218,17 +218,22 @@ class Console():
         """
         Shows your current status
         """
+        console = self.client.userData['consoles'][0] if self.client.userData.get('consoles') else None
         text = [
             '%s: %s' % ('Exception', self.client.userData['Exception']),
-            '%s: %s' % ('Friend Code', self.client.userData['User']['friendCode']),
-            '%s: %s' % ('Online', self.client.userData['User']['online']),
-            '%s: %s' % ('Message', self.client.userData['User']['message']),
         ]
-        if self.client.userData['User']['username']:
-            text.append('%s: %s' % ('Username', self.client.userData['User']['username']))
-            text.append('%s: %s' % ('Mii', self.client.userData['User']['mii']['face']))
-        if self.client.userData['User']['online']:
-            text.append('%s: %s' % ('Game', self.client.userData['User']['Presence']['game']['name']))
+        if not console:
+            text.append('%s: %s' % ('Online', False))
+            return self._log('\n'.join(text), Color.BLUE)
+        text.append('%s: %s' % ('Friend Code', console['friendCode']))
+        text.append('%s: %s' % ('Network', console['network']))
+        text.append('%s: %s' % ('Online', console['online']))
+        text.append('%s: %s' % ('Message', console['message']))
+        if console.get('username'):
+            text.append('%s: %s' % ('Username', console['username']))
+            text.append('%s: %s' % ('Mii', console['mii']['face']))
+        if console['online'] and console.get('Presence'):
+            text.append('%s: %s' % ('Game', console['Presence']['game']['name']))
         return self._log('\n'.join(text), Color.BLUE)
 
     def discord(self, command:typing.Literal['connect', 'disconnect'] = 'connect', pipe:int = '0'):
@@ -291,6 +296,21 @@ class Console():
         self.client.reflectConfig()
         return self._log('Done', Color.BLUE)
 
+    def apikey(self, newKey:str):
+        """
+        Sets a new API key
+        self, newKey:str
+        """
+        self.client.updateKey(newKey)
+        return self._log('Done', Color.BLUE)
+
+    def refresh(self):
+        """
+        Manually fetches the latest status from the server
+        """
+        self.client.loop()
+        return self._log('Done', Color.BLUE)
+
     def log(self):
         """
         Shows activity log
@@ -299,12 +319,23 @@ class Console():
 
 # Exception handling
 def APIExcept(r):
-    text = r.text
-    if '429' in r.text:
-        text = 'You have reached your rate-limit for this resource.'
-    elif '502' in r.text:
-        text = 'The frontend is offline. Please try again later.'
-    raise APIException(text)
+    status = r.status_code
+    if status == 429:
+        raise APIException('You have reached your rate-limit for this resource.')
+    if status == 404:
+        raise APIException('Not found (404): the configured endpoint does not expose this API route. Make sure you selected the correct endpoint.')
+    if status == 502:
+        raise APIException('Backend currently offline. please try again later')
+    try:
+        data = r.json()
+        text = str(data.get('Exception') or data)
+    except Exception:
+        text = r.text
+        if '<html' in text.lower() or '<!doctype html' in text.lower():
+            text = 'Unexpected HTML response from the server (status %s). Is this the correct endpoint?' % status
+        elif len(text) > 200:
+            text = text[:200] + '...'
+    raise APIException(text or 'Unexpected response from the server')
 
 class APIException(Exception):
     pass
