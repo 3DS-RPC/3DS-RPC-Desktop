@@ -8,6 +8,7 @@ pycryptodomex
 
 # Necessary only for creating application bundles on macOS.
 py2app; sys_platform == 'darwin'
+setuptools<84; sys_platform == 'darwin'
 # Elsewhere, or for CLI usage, we bundle everything
 # within a single executable via pyinstaller.
 pyinstaller
