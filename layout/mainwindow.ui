@@ -23,91 +23,32 @@
     </rect>
    </property>
    <property name="currentIndex">
-    <number>1</number>
+    <number>0</number>
    </property>
    <widget class="QWidget" name="bot">
-    <widget class="QLabel" name="description">
+    <widget class="QLabel" name="welcomeLogo">
      <property name="geometry">
       <rect>
-       <x>130</x>
-       <y>80</y>
-       <width>331</width>
-       <height>71</height>
+       <x>190</x>
+       <y>25</y>
+       <width>220</width>
+       <height>220</height>
       </rect>
      </property>
      <property name="text">
-      <string>Add the bot's FC to your friend list before continuing to the next page.</string>
-     </property>
-     <property name="alignment">
-      <set>Qt::AlignCenter</set>
-     </property>
-     <property name="wordWrap">
-      <bool>true</bool>
-     </property>
-    </widget>
-    <widget class="QGroupBox" name="section">
-     <property name="geometry">
-      <rect>
-       <x>40</x>
-       <y>190</y>
-       <width>511</width>
-       <height>211</height>
-      </rect>
-     </property>
-     <property name="title">
       <string/>
      </property>
-     <widget class="QPushButton" name="continueButton">
-      <property name="geometry">
-       <rect>
-        <x>160</x>
-        <y>140</y>
-        <width>181</width>
-        <height>31</height>
-       </rect>
-      </property>
-      <property name="cursor">
-       <cursorShape>PointingHandCursor</cursorShape>
-      </property>
-      <property name="text">
-       <string>Continue</string>
-      </property>
-     </widget>
-     <widget class="QLabel" name="botFCLabel">
-      <property name="geometry">
-       <rect>
-        <x>90</x>
-        <y>40</y>
-        <width>331</width>
-        <height>71</height>
-       </rect>
-      </property>
-      <property name="font">
-       <font>
-        <pointsize>20</pointsize>
-        <weight>75</weight>
-        <bold>true</bold>
-        <underline>true</underline>
-       </font>
-      </property>
-      <property name="text">
-       <string>XXXX-XXXX-XXXX</string>
-      </property>
-      <property name="alignment">
-       <set>Qt::AlignCenter</set>
-      </property>
-      <property name="wordWrap">
-       <bool>true</bool>
-      </property>
-     </widget>
+     <property name="scaledContents">
+      <bool>true</bool>
+     </property>
     </widget>
     <widget class="QLabel" name="title">
      <property name="geometry">
       <rect>
        <x>100</x>
-       <y>20</y>
-       <width>391</width>
-       <height>61</height>
+       <y>255</y>
+       <width>400</width>
+       <height>60</height>
       </rect>
      </property>
      <property name="font">
@@ -116,19 +57,54 @@
       </font>
      </property>
      <property name="text">
-      <string>Link a Friend Code</string>
+      <string>Welcome</string>
      </property>
      <property name="alignment">
       <set>Qt::AlignCenter</set>
      </property>
     </widget>
+    <widget class="QLabel" name="description">
+     <property name="geometry">
+      <rect>
+       <x>100</x>
+       <y>315</y>
+       <width>400</width>
+       <height>75</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Choose your endpoint and enter your API key to get started.</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignCenter</set>
+     </property>
+     <property name="wordWrap">
+      <bool>true</bool>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="continueButton">
+     <property name="geometry">
+      <rect>
+       <x>180</x>
+       <y>410</y>
+       <width>240</width>
+       <height>45</height>
+      </rect>
+     </property>
+     <property name="cursor">
+      <cursorShape>PointingHandCursor</cursorShape>
+     </property>
+     <property name="text">
+      <string>Continue</string>
+     </property>
+    </widget>
     <widget class="QLabel" name="description_2">
      <property name="geometry">
       <rect>
-       <x>130</x>
-       <y>420</y>
-       <width>331</width>
-       <height>81</height>
+       <x>110</x>
+       <y>500</y>
+       <width>380</width>
+       <height>80</height>
       </rect>
      </property>
      <property name="text">
@@ -145,18 +121,191 @@
      </property>
     </widget>
    </widget>
-   <widget class="QWidget" name="link">
-    <widget class="QLabel" name="description2">
+   <widget class="QWidget" name="endpoint">
+    <widget class="QLabel" name="endpointTitle">
      <property name="geometry">
       <rect>
-       <x>130</x>
-       <y>80</y>
-       <width>331</width>
-       <height>71</height>
+       <x>100</x>
+       <y>50</y>
+       <width>400</width>
+       <height>60</height>
+      </rect>
+     </property>
+     <property name="font">
+      <font>
+       <pointsize>31</pointsize>
+      </font>
+     </property>
+     <property name="text">
+      <string>Endpoint</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignCenter</set>
+     </property>
+    </widget>
+    <widget class="QLabel" name="endpointDescription">
+     <property name="geometry">
+      <rect>
+       <x>100</x>
+       <y>115</y>
+       <width>400</width>
+       <height>70</height>
       </rect>
      </property>
      <property name="text">
-      <string>Make certain that you have added the bot account's FC to your friendlist before pressing &quot;Log In&quot;.</string>
+      <string>Choose which server to connect to. Official is hosted; custom lets you point the app at any compatible server.</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignCenter</set>
+     </property>
+     <property name="wordWrap">
+      <bool>true</bool>
+     </property>
+    </widget>
+    <widget class="QGroupBox" name="section3">
+     <property name="geometry">
+      <rect>
+       <x>80</x>
+       <y>210</y>
+       <width>440</width>
+       <height>220</height>
+      </rect>
+     </property>
+     <property name="title">
+      <string/>
+     </property>
+     <widget class="QComboBox" name="endpointInput">
+      <property name="geometry">
+       <rect>
+        <x>130</x>
+        <y>50</y>
+        <width>270</width>
+        <height>30</height>
+       </rect>
+      </property>
+      <item>
+       <property name="text">
+        <string>official</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>custom</string>
+       </property>
+      </item>
+     </widget>
+     <widget class="QLabel" name="endpointLabel">
+      <property name="geometry">
+       <rect>
+        <x>30</x>
+        <y>50</y>
+        <width>90</width>
+        <height>30</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Endpoint</string>
+      </property>
+      <property name="alignment">
+       <set>Qt::AlignRight|Qt::AlignVCenter</set>
+      </property>
+     </widget>
+     <widget class="QLineEdit" name="customEndpointInput">
+      <property name="geometry">
+       <rect>
+        <x>130</x>
+        <y>100</y>
+        <width>270</width>
+        <height>30</height>
+       </rect>
+      </property>
+      <property name="placeholderText">
+       <string>https://your-server.example.com</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="endpointHint">
+      <property name="geometry">
+       <rect>
+        <x>130</x>
+        <y>133</y>
+        <width>270</width>
+        <height>22</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+      <property name="alignment">
+       <set>Qt::AlignCenter</set>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="saveEndpointButton">
+      <property name="geometry">
+       <rect>
+        <x>230</x>
+        <y>160</y>
+        <width>150</width>
+        <height>40</height>
+       </rect>
+      </property>
+      <property name="cursor">
+       <cursorShape>PointingHandCursor</cursorShape>
+      </property>
+      <property name="text">
+       <string>Save</string>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="backEndpointButton">
+      <property name="geometry">
+       <rect>
+        <x>60</x>
+        <y>160</y>
+        <width>150</width>
+        <height>40</height>
+       </rect>
+      </property>
+      <property name="cursor">
+       <cursorShape>PointingHandCursor</cursorShape>
+      </property>
+      <property name="text">
+       <string>Back</string>
+      </property>
+     </widget>
+    </widget>
+   </widget>
+   <widget class="QWidget" name="link">
+    <widget class="QLabel" name="title2">
+     <property name="geometry">
+      <rect>
+       <x>100</x>
+       <y>70</y>
+       <width>400</width>
+       <height>60</height>
+      </rect>
+     </property>
+     <property name="font">
+      <font>
+       <pointsize>31</pointsize>
+      </font>
+     </property>
+     <property name="text">
+      <string>Enter your API Key</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignCenter</set>
+     </property>
+    </widget>
+    <widget class="QLabel" name="description2">
+     <property name="geometry">
+      <rect>
+       <x>100</x>
+       <y>140</y>
+       <width>400</width>
+       <height>60</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>You can find your API key on the Settings page of your endpoint.</string>
      </property>
      <property name="alignment">
       <set>Qt::AlignCenter</set>
@@ -168,22 +317,51 @@
     <widget class="QGroupBox" name="section2">
      <property name="geometry">
       <rect>
-       <x>40</x>
-       <y>190</y>
-       <width>511</width>
-       <height>211</height>
+       <x>80</x>
+       <y>220</y>
+       <width>440</width>
+       <height>210</height>
       </rect>
      </property>
      <property name="title">
       <string/>
      </property>
+     <widget class="QLabel" name="keyLabel">
+      <property name="geometry">
+       <rect>
+        <x>30</x>
+        <y>85</y>
+        <width>90</width>
+        <height>30</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>API Key</string>
+      </property>
+      <property name="alignment">
+       <set>Qt::AlignRight|Qt::AlignVCenter</set>
+      </property>
+     </widget>
+     <widget class="QLineEdit" name="keyInput">
+      <property name="geometry">
+       <rect>
+        <x>130</x>
+        <y>85</y>
+        <width>270</width>
+        <height>30</height>
+       </rect>
+      </property>
+      <property name="placeholderText">
+       <string>Enter your API key from your endpoint's Settings page!</string>
+      </property>
+     </widget>
      <widget class="QPushButton" name="loginButton">
       <property name="geometry">
        <rect>
-        <x>160</x>
-        <y>140</y>
-        <width>181</width>
-        <height>31</height>
+        <x>140</x>
+        <y>150</y>
+        <width>220</width>
+        <height>40</height>
        </rect>
       </property>
       <property name="cursor">
@@ -193,48 +371,14 @@
        <string>Log In</string>
       </property>
      </widget>
-     <widget class="QLineEdit" name="fcInput">
-      <property name="geometry">
-       <rect>
-        <x>80</x>
-        <y>70</y>
-        <width>341</width>
-        <height>24</height>
-       </rect>
-      </property>
-      <property name="placeholderText">
-       <string>Enter your friend code here!</string>
-      </property>
-     </widget>
-    </widget>
-    <widget class="QLabel" name="title2">
-     <property name="geometry">
-      <rect>
-       <x>100</x>
-       <y>20</y>
-       <width>391</width>
-       <height>61</height>
-      </rect>
-     </property>
-     <property name="font">
-      <font>
-       <pointsize>31</pointsize>
-      </font>
-     </property>
-     <property name="text">
-      <string>Link a Friend Code</string>
-     </property>
-     <property name="alignment">
-      <set>Qt::AlignCenter</set>
-     </property>
     </widget>
     <widget class="QLabel" name="description_3">
      <property name="geometry">
       <rect>
-       <x>130</x>
-       <y>420</y>
-       <width>331</width>
-       <height>81</height>
+       <x>110</x>
+       <y>490</y>
+       <width>380</width>
+       <height>80</height>
       </rect>
      </property>
      <property name="text">
@@ -250,8 +394,47 @@
       <bool>true</bool>
      </property>
     </widget>
-   </widget>
-   <widget class="QWidget" name="main">
+</widget>
+    <widget class="QWidget" name="loading">
+     <widget class="QLabel" name="loadingTitle">
+      <property name="geometry">
+       <rect>
+        <x>100</x>
+        <y>250</y>
+        <width>400</width>
+        <height>60</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <pointsize>31</pointsize>
+       </font>
+      </property>
+      <property name="text">
+       <string>Fetching profile...</string>
+      </property>
+      <property name="alignment">
+       <set>Qt::AlignCenter</set>
+      </property>
+     </widget>
+     <widget class="QLabel" name="loadingText">
+      <property name="geometry">
+       <rect>
+        <x>100</x>
+        <y>320</y>
+        <width>400</width>
+        <height>40</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Retrieving your latest activity from the server.</string>
+      </property>
+      <property name="alignment">
+       <set>Qt::AlignCenter</set>
+      </property>
+     </widget>
+    </widget>
+    <widget class="QWidget" name="main">
     <widget class="QPushButton" name="settingsButton">
      <property name="geometry">
       <rect>
@@ -268,11 +451,27 @@
       <string>Settings</string>
      </property>
     </widget>
+    <widget class="QPushButton" name="refreshButton">
+     <property name="geometry">
+      <rect>
+       <x>215</x>
+       <y>65</y>
+       <width>170</width>
+       <height>40</height>
+      </rect>
+     </property>
+     <property name="cursor">
+      <cursorShape>PointingHandCursor</cursorShape>
+     </property>
+     <property name="text">
+      <string>Refresh</string>
+     </property>
+    </widget>
     <widget class="QGroupBox" name="friendCard">
      <property name="geometry">
       <rect>
        <x>80</x>
-       <y>190</y>
+       <y>115</y>
        <width>451</width>
        <height>231</height>
       </rect>
@@ -355,21 +554,24 @@
       <string>X Close</string>
      </property>
     </widget>
-    <widget class="QGroupBox" name="gamePlate">
-     <property name="geometry">
-      <rect>
-       <x>30</x>
-       <y>230</y>
-       <width>321</width>
-       <height>111</height>
-      </rect>
-     </property>
-     <property name="cursor">
-      <cursorShape>PointingHandCursor</cursorShape>
-     </property>
-     <property name="title">
-      <string/>
-     </property>
+<widget class="QGroupBox" name="gamePlate">
+      <property name="geometry">
+       <rect>
+        <x>30</x>
+        <y>155</y>
+        <width>321</width>
+        <height>111</height>
+       </rect>
+      </property>
+      <property name="cursor">
+       <cursorShape>PointingHandCursor</cursorShape>
+      </property>
+      <property name="visible">
+       <bool>false</bool>
+      </property>
+      <property name="title">
+       <string/>
+      </property>
      <widget class="QLabel" name="gameIcon">
       <property name="geometry">
        <rect>
@@ -397,8 +599,104 @@
       </property>
      </widget>
     </widget>
-   </widget>
-   <widget class="QWidget" name="settings">
+    <widget class="QGroupBox" name="detailsCard">
+     <property name="geometry">
+      <rect>
+       <x>80</x>
+       <y>375</y>
+       <width>451</width>
+       <height>135</height>
+      </rect>
+     </property>
+     <property name="title">
+      <string/>
+     </property>
+     <widget class="QLabel" name="networkDetail">
+      <property name="geometry">
+       <rect>
+        <x>20</x>
+        <y>44</y>
+        <width>411</width>
+        <height>24</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+      <property name="alignment">
+       <set>Qt::AlignCenter</set>
+      </property>
+     </widget>
+     <widget class="QLabel" name="endpointDetail">
+      <property name="geometry">
+       <rect>
+        <x>20</x>
+        <y>18</y>
+        <width>411</width>
+        <height>24</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+      <property name="alignment">
+       <set>Qt::AlignCenter</set>
+      </property>
+     </widget>
+     <widget class="QLabel" name="lastActiveDetail">
+      <property name="geometry">
+       <rect>
+        <x>20</x>
+        <y>70</y>
+        <width>411</width>
+        <height>24</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+      <property name="alignment">
+       <set>Qt::AlignCenter</set>
+      </property>
+     </widget>
+     <widget class="QLabel" name="lastOnlineDetail">
+      <property name="geometry">
+       <rect>
+        <x>20</x>
+        <y>96</y>
+        <width>411</width>
+        <height>24</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+      <property name="alignment">
+       <set>Qt::AlignCenter</set>
+      </property>
+</widget>
+     </widget>
+     <widget class="QLabel" name="versionLabel">
+      <property name="geometry">
+       <rect>
+        <x>100</x>
+        <y>528</y>
+        <width>400</width>
+        <height>25</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+      <property name="alignment">
+       <set>Qt::AlignCenter</set>
+      </property>
+      <property name="styleSheet">
+       <string>color: #9E9E9E; font-size: 11px;</string>
+      </property>
+     </widget>
+    </widget>
+    <widget class="QWidget" name="settings">
     <widget class="QPushButton" name="okButton">
      <property name="geometry">
       <rect>
@@ -614,6 +912,22 @@
       <string/>
      </property>
     </widget>
+    <widget class="QPushButton" name="endpointButton">
+     <property name="geometry">
+      <rect>
+       <x>165</x>
+       <y>531</y>
+       <width>270</width>
+       <height>27</height>
+      </rect>
+     </property>
+     <property name="cursor">
+      <cursorShape>PointingHandCursor</cursorShape>
+     </property>
+     <property name="text">
+      <string>Endpoint</string>
+     </property>
+    </widget>
     <zorder>showSmallImage</zorder>
     <zorder>showProfileButton</zorder>
     <zorder>showElapsed</zorder>
@@ -628,6 +942,7 @@
     <zorder>showProfileButtonText</zorder>
     <zorder>showSmallImageText</zorder>
     <zorder>okButtonLogout</zorder>
+    <zorder>endpointButton</zorder>
    </widget>
   </widget>
  </widget>
