@@ -216,7 +216,7 @@ class Client():
             if presence.get('gameDescription'):
                 kwargs['state'] = presence['gameDescription']
             if self.showProfileButton and console.get('username'):
-                kwargs['buttons'] = [{'label': 'Profile', 'url': self.host + '/user/' + console['friendCode']},]
+                kwargs['buttons'] = [{'label': 'Profile', 'url': self.host + '/user/' + console['friendCode'] + '?network=' + console.get('network', '')},]
             if self.showElapsed:
                 kwargs['start'] = self.start
             if self.showSmallImage and console.get('username') and game.get('icon_url'):

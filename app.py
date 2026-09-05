@@ -205,7 +205,7 @@ class GUI(Ui_MainWindow):
         self.setFontText(self.username, console.get('username', ''))
         if console.get('mii'):
             up(self.miiLabel, console['mii']['face'])
-        self.friendCard.mouseReleaseEvent = lambda event : self.openLink(client.host + '/user/%s' % console['friendCode'])
+        self.friendCard.mouseReleaseEvent = lambda event : self.openLink(client.host + '/user/%s?network=%s' % (console['friendCode'], console.get('network', '')))
 
     def refresh(self):
         if not client:
