@@ -89,16 +89,9 @@ QLabel[objectName*="friendCard"] {
     color: #E39240;
     font-weight: bold;
 }
-QGroupBox[objectName*="namePlate"] {
-    background-color: #fff;
-    border-radius: 0px;
-    border-top-left-radius: 15px;
-    border-top-right-radius: 15px;
-}
-QLabel[objectName*="namePlate"] {
-    font-size: 30px;
+QLabel[objectName*="username"] {
     color: #882D12;
-    font-weight: normal;
+    font-weight: bold;
 }
 QPushButton[objectName*="show"] {
     background-color: #E1E1E1;

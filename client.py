@@ -197,6 +197,8 @@ class Client():
 
             presence = console['Presence']
             game = presence['game']
+            img_url = game.get('banner_url') or game.get('icon_url')
+            log('Game image URL: %r (banner=%r icon=%r)' % (img_url, game.get('banner_url'), game.get('icon_url')))
 
             if self.currentGame != game:
                 logger += ' [%s -> %s]' % (self.currentGame['@id'], game['@id'])
@@ -210,8 +212,8 @@ class Client():
                 # Include View Profile setting?
                 # Certainly something when presence['joinable'] == True
             }
-            if game.get('icon_url'):
-                kwargs['large_image'] = game['icon_url'].replace('/cdn/', self.host + '/cdn/')
+            if img_url:
+                kwargs['large_image'] = img_url.replace('/cdn/', self.host + '/cdn/')
                 kwargs['large_text'] = game['name']
             if presence.get('gameDescription'):
                 kwargs['state'] = presence['gameDescription']
@@ -219,7 +221,7 @@ class Client():
                 kwargs['buttons'] = [{'label': 'Profile', 'url': self.host + '/user/' + console['friendCode'] + '?network=' + console.get('network', '')},]
             if self.showElapsed:
                 kwargs['start'] = self.start
-            if self.showSmallImage and console.get('username') and game.get('icon_url'):
+            if self.showSmallImage and console.get('username') and img_url:
                 kwargs['small_image'] = console['mii']['face']
                 kwargs['small_text'] = '-'.join(console['friendCode'][i:i+4] for i in range(0, 12, 4))
             for key in list(kwargs): # Blatant rip from OpenEmuRPC (also made by me. Check it out if you want)

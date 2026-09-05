@@ -54,15 +54,19 @@ offlineStyle = style.replace('#FFC693', '#B7B7B7').replace('#E39240', '#AAA6A3')
 def loadPix(url):
     _pixmap = QPixmap()
     try:
-        _pixmap.loadFromData(requests.get(url, verify = False, timeout = 10).content)
-    except Exception:
-        pass
+        r = requests.get(url, verify = False, timeout = 10)
+        ok = _pixmap.loadFromData(r.content)
+        # log('Image: %s -> HTTP %s, %s bytes, %s' % (url, r.status_code, len(r.content), 'decoded' if ok else 'INVALID DATA'))
+    except Exception as e:
+        log('Image load error: %s -> %s' % (url, e))
     return _pixmap
 
 def up(_label,image):
     _label.clear()
     if isinstance(image,str):
         image = loadPix(image)
+    if not image.isNull():
+        image = image.scaled(_label.size(), Qt.KeepAspectRatio, Qt.SmoothTransformation)
     _label.setPixmap(image)
 
 class GUI(Ui_MainWindow):
@@ -201,7 +205,7 @@ class GUI(Ui_MainWindow):
         if not console:
             return
         self.miiLabel.setScaledContents(True)
-        self.gameIcon.setScaledContents(True)
+        self.gameIcon.setScaledContents(False)
         self.setFontText(self.username, console.get('username', ''))
         if console.get('mii'):
             up(self.miiLabel, console['mii']['face'])
@@ -307,15 +311,20 @@ class GUI(Ui_MainWindow):
             self.updateProfile()
             self.updateDetails()
             if data:
-                self.gamePlate.show()
+                self.gameIcon.show()
+                self.gameName.show()
                 game = client.userData['consoles'][0]['Presence']['game']
                 publisher = (game.get('publisher') or {}).get('name', '')
-                self.gamePlate.mouseReleaseEvent = lambda a : self.openLink('https://www.google.com/search?q=%s' % '+'.join((game['name'] + ' ' + publisher).split(' ')))
-                if data.get('large_image') and not client.local:
+                self.gameIcon.mouseReleaseEvent = lambda a : self.openLink('https://www.google.com/search?q=%s' % '+'.join((game['name'] + ' ' + publisher).split(' ')))
+                self.gameName.mouseReleaseEvent = lambda a : self.openLink('https://www.google.com/search?q=%s' % '+'.join((game['name'] + ' ' + publisher).split(' ')))
+                if data.get('large_image'):
                     up(self.gameIcon, data['large_image'])
+                else:
+                    log('No game image shown: large_image=%r' % data.get('large_image'))
                 self.setFontText(self.gameName, data['details'])
             else:
-                self.gamePlate.hide()
+                self.gameIcon.hide()
+                self.gameName.hide()
             self.underLyingButton.click()
         except Exception as e:
             print('Update error: %s' % e)

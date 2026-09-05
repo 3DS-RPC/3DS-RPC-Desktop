@@ -1,27 +1,27 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
  <class>MainWindow</class>
- <widget class="QWidget" name="MainWindow">
-  <property name="geometry">
-   <rect>
-    <x>0</x>
-    <y>0</y>
-    <width>600</width>
-    <height>600</height>
-   </rect>
-  </property>
-  <property name="windowTitle">
-   <string>3DS Rich Presence</string>
-  </property>
-  <widget class="QStackedWidget" name="stackedWidget">
+<widget class="QWidget" name="MainWindow">
    <property name="geometry">
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>601</width>
-     <height>601</height>
+     <width>600</width>
+     <height>600</height>
     </rect>
    </property>
+  <property name="windowTitle">
+   <string>3DS Rich Presence</string>
+  </property>
+<widget class="QStackedWidget" name="stackedWidget">
+    <property name="geometry">
+     <rect>
+      <x>0</x>
+      <y>0</y>
+      <width>601</width>
+      <height>601</height>
+     </rect>
+    </property>
    <property name="currentIndex">
     <number>0</number>
    </property>
@@ -467,13 +467,13 @@
       <string>Refresh</string>
      </property>
     </widget>
-    <widget class="QGroupBox" name="friendCard">
+<widget class="QGroupBox" name="friendCard">
      <property name="geometry">
       <rect>
        <x>80</x>
        <y>115</y>
        <width>451</width>
-       <height>231</height>
+       <height>260</height>
       </rect>
      </property>
      <property name="cursor">
@@ -482,39 +482,10 @@
      <property name="title">
       <string/>
      </property>
-     <widget class="QGroupBox" name="namePlate">
-      <property name="geometry">
-       <rect>
-        <x>0</x>
-        <y>170</y>
-        <width>451</width>
-        <height>81</height>
-       </rect>
-      </property>
-      <property name="title">
-       <string/>
-      </property>
-      <widget class="QLabel" name="username">
-       <property name="geometry">
-        <rect>
-         <x>280</x>
-         <y>10</y>
-         <width>151</width>
-         <height>41</height>
-        </rect>
-       </property>
-       <property name="text">
-        <string/>
-       </property>
-       <property name="alignment">
-        <set>Qt::AlignCenter</set>
-       </property>
-      </widget>
-     </widget>
      <widget class="QLabel" name="status">
       <property name="geometry">
        <rect>
-        <x>10</x>
+        <x>12</x>
         <y>10</y>
         <width>101</width>
         <height>21</height>
@@ -527,14 +498,59 @@
      <widget class="QLabel" name="miiLabel">
       <property name="geometry">
        <rect>
-        <x>280</x>
-        <y>20</y>
-        <width>151</width>
-        <height>151</height>
+        <x>268</x>
+        <y>45</y>
+        <width>140</width>
+        <height>140</height>
        </rect>
       </property>
       <property name="text">
        <string/>
+      </property>
+     </widget>
+     <widget class="QLabel" name="username">
+      <property name="geometry">
+       <rect>
+        <x>238</x>
+        <y>195</y>
+        <width>200</width>
+        <height>35</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+      <property name="alignment">
+       <set>Qt::AlignCenter</set>
+      </property>
+     </widget>
+     <widget class="QLabel" name="gameIcon">
+      <property name="geometry">
+       <rect>
+        <x>38</x>
+        <y>40</y>
+        <width>150</width>
+        <height>150</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+     </widget>
+     <widget class="QLabel" name="gameName">
+      <property name="geometry">
+       <rect>
+        <x>13</x>
+        <y>200</y>
+        <width>200</width>
+        <height>35</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+      <property name="alignment">
+       <set>Qt::AlignCenter</set>
       </property>
      </widget>
     </widget>
@@ -553,57 +569,12 @@
      <property name="text">
       <string>X Close</string>
      </property>
-    </widget>
-<widget class="QGroupBox" name="gamePlate">
-      <property name="geometry">
-       <rect>
-        <x>30</x>
-        <y>155</y>
-        <width>321</width>
-        <height>111</height>
-       </rect>
-      </property>
-      <property name="cursor">
-       <cursorShape>PointingHandCursor</cursorShape>
-      </property>
-      <property name="visible">
-       <bool>false</bool>
-      </property>
-      <property name="title">
-       <string/>
-      </property>
-     <widget class="QLabel" name="gameIcon">
-      <property name="geometry">
-       <rect>
-        <x>20</x>
-        <y>30</y>
-        <width>51</width>
-        <height>51</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string/>
-      </property>
-     </widget>
-     <widget class="QLabel" name="gameName">
-      <property name="geometry">
-       <rect>
-        <x>80</x>
-        <y>40</y>
-        <width>231</width>
-        <height>31</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string/>
-      </property>
-     </widget>
-    </widget>
+</widget>
     <widget class="QGroupBox" name="detailsCard">
      <property name="geometry">
       <rect>
        <x>80</x>
-       <y>375</y>
+       <y>385</y>
        <width>451</width>
        <height>135</height>
       </rect>
@@ -659,7 +630,7 @@
        <set>Qt::AlignCenter</set>
       </property>
      </widget>
-     <widget class="QLabel" name="lastOnlineDetail">
+<widget class="QLabel" name="lastOnlineDetail">
       <property name="geometry">
        <rect>
         <x>20</x>
@@ -668,13 +639,13 @@
         <height>24</height>
        </rect>
       </property>
-      <property name="text">
-       <string/>
-      </property>
-      <property name="alignment">
-       <set>Qt::AlignCenter</set>
-      </property>
-</widget>
+       <property name="text">
+        <string/>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignCenter</set>
+       </property>
+      </widget>
      </widget>
      <widget class="QLabel" name="versionLabel">
       <property name="geometry">
